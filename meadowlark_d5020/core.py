@@ -82,6 +82,16 @@ class Channel:
     ###########################################################################
 
     @property
+    def waveform(self):
+        return self.__waveform
+
+    @waveform.setter
+    def set_waveform(self, value : Waveform):
+        self.__waveform = value
+
+    ###########################################################################
+
+    @property
     def v1(self):
         return self.__v1
 
