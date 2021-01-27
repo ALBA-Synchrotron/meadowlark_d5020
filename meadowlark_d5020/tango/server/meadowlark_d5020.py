@@ -11,17 +11,19 @@ import serial
 from tango import GreenMode
 from tango.server import Device, attribute, command, device_property
 
-import meadowlark_d5020.core
+from  meadowlark_d5020.core import Meadowlark_d5020
+from meadowlark_d5020.core import Channel
 from meadowlark_d5020.core import Waveform
 
 class Meadowlark_d5020(Device):
 
     url = device_property(dtype=str)
 
+
     def init_device(self):
         super().init_device()
         self.connection = serial.connection_for_url(self.url)
-        self.meadowlark_d5020 = meadowlark_d5020.core.Meadowlark_d5020(self.connection)
+        self.meadowlark_d5020 = Meadowlark_d5020(self.connection)
 
     ###########################################################################
 
@@ -38,7 +40,7 @@ class Meadowlark_d5020(Device):
     @attribute(dtype=int, unit="mV", label="V1", min_value=0, max_value=10000,
                doc="v1")
     def v1(self):        
-        return self.meadowlark_d5020.v1
+        return self.meadowlark_d5020.channel_1.v1
 
     @v1.setter
     def set_v1(self, value):        
@@ -107,17 +109,44 @@ class Meadowlark_d5020(Device):
         return self.meadowlark_d5020.external_input
 
     @command
-    def toggle_external_input(self):        
+    def toggle_external_input(self):
         self.meadowlark_d5020.toggle_external_input()
 
     ###########################################################################
 
     @command
-    def turn_on(self):
-        # example returning the coroutine back to who calling function
-        return self.meadowlark_d5020.turn_on()
+    def threshold(self, v1, v2):
+        return self.meadowlark_d5020.threshold(v1,v2)
 
+    ###########################################################################
 
+    @attribute(dtype=bool, unit="ºC", label="LC Temperature", 
+               doc="Query current temperature of temperature controlled LC on "
+               "channel n.")
+    def lc_temperature(self):
+        return self.meadowlark_d5020.lc_temperature()
+
+    ###########################################################################
+
+    @command(doc="""
+    I/O connector n is monitored for pulses. When a pulse is received, if 
+        the output is at V1, it switches to V2. If the output is at V2, it 
+        switches to V1.""")
+    def trigger(self):
+        return self.meadowlark_d5020.trigger()
+
+    ###########################################################################
+
+    @attribute(dtype=float, unit="ºC", label="Temperature Setpoint",
+               min_value=0.0, max_value=226.0)
+    def temperature_setpoint(self):
+        return self.meadowlark_d5020.temperature_setpoint()
+
+    @temperature_setpoint.setter
+    def set_temperature_setpoint(self, value):        
+        self.meadowlark_d5020.temperature_setpoint = value
+
+    ###########################################################################
 if __name__ == "__main__":
     import logging
     fmt = "%(asctime)s %(levelname)s %(name)s %(message)s"
