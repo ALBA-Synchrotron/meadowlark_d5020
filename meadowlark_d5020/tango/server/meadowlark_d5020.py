@@ -11,19 +11,19 @@ import serial
 from tango import GreenMode
 from tango.server import Device, attribute, command, device_property
 
-from  meadowlark_d5020.core import Meadowlark_d5020
+from meadowlark_d5020.core import Meadowlark_d5020 as Core
 from meadowlark_d5020.core import Channel
 from meadowlark_d5020.core import Waveform
+
 
 class Meadowlark_d5020(Device):
 
     url = device_property(dtype=str)
 
-
     def init_device(self):
         super().init_device()
-        self.connection = serial.connection_for_url(self.url)
-        self.meadowlark_d5020 = Meadowlark_d5020(self.connection)
+        self.connection = serial.serial_for_url(self.url)
+        self.meadowlark_d5020 = Core(self.connection)
 
     ###########################################################################
 
@@ -34,76 +34,76 @@ class Meadowlark_d5020(Device):
     @waveform.setter
     def set_waveform(self, value):
         self.meadowlark_d5020.waveform = value
-    
+
     ###########################################################################
 
     @attribute(dtype=int, unit="mV", label="V1", min_value=0, max_value=10000,
                doc="v1")
-    def v1(self):        
+    def v1(self):
         return self.meadowlark_d5020.channel_1.v1
 
     @v1.setter
-    def set_v1(self, value):        
+    def set_v1(self, value):
         self.meadowlark_d5020.v1 = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="mV", label="V2", min_value=0, max_value=10000,
                doc="v2")
-    def v2(self):        
+    def v2(self):
         return self.meadowlark_d5020.v2
 
     @v2.setter
-    def set_v2(self, value):        
+    def set_v2(self, value):
         self.meadowlark_d5020.v2 = value
 
     ###########################################################################
 
-    @attribute(dtype=int, unit="ms", label="period", min_value=0, max_value=65535,
-               doc="period")
-    def period(self):        
+    @attribute(dtype=int, unit="ms", label="period", min_value=0,
+               max_value=65535, doc="period")
+    def period(self):
         return self.meadowlark_d5020.period
 
     @period.setter
-    def set_period(self, value):        
+    def set_period(self, value):
         self.meadowlark_d5020.period = value
 
     ###########################################################################
 
-    @attribute(dtype=int, unit="degrees", label="phase", min_value=-360, max_value=360,
-               doc="phase")
-    def phase(self):        
+    @attribute(dtype=int, unit="degrees", label="phase", min_value=-360,
+               max_value=360, doc="phase")
+    def phase(self):
         return self.meadowlark_d5020.phase
 
     @phase.setter
-    def set_phase(self, value):        
+    def set_phase(self, value):
         self.meadowlark_d5020.phase = value
 
     ###########################################################################
 
-    @attribute(dtype=int, unit="%", label="duty cycle", min_value=0, max_value=100,
-               doc="duty cycle")
-    def duty_cycle(self):        
+    @attribute(dtype=int, unit="%", label="duty cycle", min_value=0,
+               max_value=100, doc="duty cycle")
+    def duty_cycle(self):
         return self.meadowlark_d5020.duty_cycle
 
     @duty_cycle.setter
-    def set_duty_cycle(self, value):        
+    def set_duty_cycle(self, value):
         self.meadowlark_d5020.duty_cycle = value
 
     ###########################################################################
 
-    @attribute(dtype=int, unit="mV", label="Transient Nematic Effect Voltage", 
+    @attribute(dtype=int, unit="mV", label="Transient Nematic Effect Voltage",
                min_value=0, max_value=10000, doc="T.N.E Voltage")
-    def tne_voltage(self):        
+    def tne_voltage(self):
         return self.meadowlark_d5020.tne_voltage
 
     @tne_voltage.setter
-    def set_tne_voltage(self, value):        
+    def set_tne_voltage(self, value):
         self.meadowlark_d5020.tne_voltage = value
 
     ###########################################################################
 
-    @attribute(dtype=bool, label="External input", 
+    @attribute(dtype=bool, label="External input",
                doc="Check if the external input is enabled")
     def external_input(self):
         return self.meadowlark_d5020.external_input
@@ -116,11 +116,11 @@ class Meadowlark_d5020(Device):
 
     @command
     def threshold(self, v1, v2):
-        return self.meadowlark_d5020.threshold(v1,v2)
+        return self.meadowlark_d5020.threshold(v1, v2)
 
     ###########################################################################
 
-    @attribute(dtype=bool, unit="ºC", label="LC Temperature", 
+    @attribute(dtype=bool, unit="ºC", label="LC Temperature",
                doc="Query current temperature of temperature controlled LC on "
                "channel n.")
     def lc_temperature(self):
@@ -128,10 +128,7 @@ class Meadowlark_d5020(Device):
 
     ###########################################################################
 
-    @command(doc="""
-    I/O connector n is monitored for pulses. When a pulse is received, if 
-        the output is at V1, it switches to V2. If the output is at V2, it 
-        switches to V1.""")
+    @command()
     def trigger(self):
         return self.meadowlark_d5020.trigger()
 
@@ -143,8 +140,9 @@ class Meadowlark_d5020(Device):
         return self.meadowlark_d5020.temperature_setpoint()
 
     @temperature_setpoint.setter
-    def set_temperature_setpoint(self, value):        
+    def set_temperature_setpoint(self, value):
         self.meadowlark_d5020.temperature_setpoint = value
+
 
     ###########################################################################
 if __name__ == "__main__":
