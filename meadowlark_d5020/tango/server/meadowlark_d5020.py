@@ -46,15 +46,15 @@ class Meadowlark_d5020(Device):
                 def set_waveform(value):
                     channel.waveform = value
 
-                waveform = AttrData(dtype=Waveform, label="Waveform pattern")
                 self.add_attribute(
-                    waveform, r_meth=get_waveform, w_meth=set_waveform)
+                    attribute(name="wavefrom" + str(c),
+                              dtype=Waveform,
+                              label="Waveform pattern"),
+                    r_meth=get_waveform, w_meth=set_waveform)
         except SerialException as e:
             print("Serial Exception initializing device: ", e)
             print("\nCheck the properties!")
     ###########################################################################
-
-
 
     ###########################################################################
 
@@ -172,6 +172,7 @@ class Meadowlark_d5020(Device):
     @temperature_setpoint.setter
     def set_temperature_setpoint(self, value):
         self.meadowlark_d5020.temperature_setpoint = value
+
 
     ###########################################################################
 if __name__ == "__main__":
