@@ -31,16 +31,16 @@ def clamp(n, smallest, largest): return max(smallest, min(n, largest))
 
 
 class Waveform(Enum):
-    invariant = "inv",
-    sinusoid = "sin",
-    triangle = "tri",
-    square = "sqr",
-    sawtooth = "saw",
-    TNE = "tnew"
+    invariant = 0
+    sinusoid = 1
+    triangle = 2
+    square = 3
+    sawtooth = 4
+    TNE = 5
 
 
 class Channels(Enum):
-    One = 1,
+    One = 1
     Two = 2
 
 
@@ -78,6 +78,10 @@ class Channel:
 
         # Others
         self.__external_input = False
+
+        self.dict_waveform = dict(
+            invariant="inv", sinusoid="sin", triangle="tri", square="sqr",
+            sawtooth="saw", TNE="tnew")
 
     ###########################################################################
 
@@ -228,7 +232,7 @@ class Channel:
     ###########################################################################
 
     def update_device(self):
-        w = self.__waveform
+        w = self.dict_waveform[self.__waveform.name]
         n = self.number
         v1 = self.__v1
         v2 = self.__v2
