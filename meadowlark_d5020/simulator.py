@@ -28,4 +28,5 @@ from sinstruments.simulator import BaseDevice
 class Meadowlark_d5020(BaseDevice):
 
     def handle_message(self, line):
+        print("RECV:", line)
         pass
