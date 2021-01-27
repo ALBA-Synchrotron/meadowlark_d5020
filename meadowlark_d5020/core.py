@@ -206,7 +206,7 @@ class Channel:
     ###########################################################################
 
     def trigger(self):
-        # TODO: Check if sending the command returns somethind, and if sended
+        # TODO: Check if sending the command returns something, and if sended
         # again disables the trigger.
         """
         I/O connector n is monitored for pulses. When a pulse is received, if 
@@ -239,11 +239,12 @@ class Channel:
         t = self.__period_t
         ph = self.__phase
         dc = self.__duty_cycle
-        tv = self.__vTNE
-        tt = self.__tTNE
+        tv = self.__tne_voltage
+        tt = self.__tne_time
 
         # TODO: Check if the device ignores the unused parameters.
-        self._conn.write(f"{w}:{n},{v1},{v2},{t},{ph},{dc},{tv},{tt}\n")
+        message = "{}:{},{},{},{},{},{},{},{}\n".format(w,n,v1,v2,t,ph,dc,tv,tt)
+        self._conn.write(message.encode("ascii"))
 
     def sync(self, phase, pulse_length):
         """
