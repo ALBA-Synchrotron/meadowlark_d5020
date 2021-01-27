@@ -1,0 +1,6 @@
+devices:
+- class: Meadowlark_d5020
+  package: meadowlark_d5020.simulator
+  transports:
+  - type: serial
+    url: /tmp/meadowlark_d5020
