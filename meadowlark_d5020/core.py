@@ -266,8 +266,10 @@ class Meadowlark_d5020:
     def __init__(self, conn):
         self._conn = conn
 
-        self.channel_1 = Channel()
-        self.channel_2 = Channel()
+        self.channel_1 = Channel(Channels.One, conn)
+        self.channel_2 = Channel(Channels.Two, conn)
+
+        self.channels = [self.channel_1, self.channel_2]
 
 
     @property
