@@ -179,14 +179,14 @@ class Channel:
 
     ###########################################################################
 
-    def thr(self, V1, V2):
+    def threshold(self, V1, V2):
         """
         I/O connector n is monitored, and if less than 2.5V, output = V1. 
         Otherwise, output is V2.
         """
-        assert Channel.MIN_VOLTAGE < V1 < Channel.MAX_VOLTAGE
-        assert Channel.MIN_VOLTAGE < V2 < Channel.MAX_VOLTAGE
-        self._conn.write(f"extin:{self.number}\n")
+        V1 = clamp(V1, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
+        V2 = clamp(V2, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
+        self._conn.write(f"thr:{self.number},{V1},{V2}\n")
 
     ###########################################################################
 
@@ -202,6 +202,8 @@ class Channel:
     ###########################################################################
 
     def trigger(self):
+        # TODO: Check if sending the command returns somethind, and if sended
+        # again disables the trigger.
         """
         I/O connector n is monitored for pulses. When a pulse is received, if 
         the output is at V1, it switches to V2. If the output is at V2, it 
