@@ -28,76 +28,76 @@ class Meadowlark_d5020(Device):
     ###########################################################################
 
     @attribute(dtype=Waveform, label="Waveform pattern")
-    def waveform(self):
-        return self.meadowlark_d5020.waveform
+    def channel1_waveform(self):
+        return self.meadowlark_d5020.channel_1.waveform
 
-    @waveform.setter
-    def set_waveform(self, value):
-        self.meadowlark_d5020.waveform = value
+    @channel1_waveform.setter
+    def channel1_set_waveform(self, value):
+        self.meadowlark_d5020.channel_1.waveform = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="mV", label="V1", min_value=0, max_value=10000,
                doc="v1")
-    def v1(self):
+    def channel1_v1(self):
         return self.meadowlark_d5020.channel_1.v1
 
-    @v1.setter
+    @channel1_v1.setter
     def set_v1(self, value):
-        self.meadowlark_d5020.v1 = value
+        self.meadowlark_d5020.channel_1.v1 = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="mV", label="V2", min_value=0, max_value=10000,
                doc="v2")
-    def v2(self):
-        return self.meadowlark_d5020.v2
+    def channel1_v2(self):
+        return self.meadowlark_d5020.channel_1.v2
 
-    @v2.setter
+    @channel1_v2.setter
     def set_v2(self, value):
-        self.meadowlark_d5020.v2 = value
+        self.meadowlark_d5020.channel_1.v2 = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="ms", label="period", min_value=0,
                max_value=65535, doc="period")
-    def period(self):
-        return self.meadowlark_d5020.period
+    def channel1_period(self):
+        return self.meadowlark_d5020.channel_1.period
 
-    @period.setter
-    def set_period(self, value):
-        self.meadowlark_d5020.period = value
+    @channel1_period.setter
+    def channel1_set_period(self, value):
+        self.meadowlark_d5020.channel_1.period = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="degrees", label="phase", min_value=-360,
                max_value=360, doc="phase")
-    def phase(self):
-        return self.meadowlark_d5020.phase
+    def channel1_phase(self):
+        return self.meadowlark_d5020.channel_1.phase
 
-    @phase.setter
-    def set_phase(self, value):
-        self.meadowlark_d5020.phase = value
+    @channel1_phase.setter
+    def channel1_set_phase(self, value):
+        self.meadowlark_d5020.channel_1.phase = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="%", label="duty cycle", min_value=0,
                max_value=100, doc="duty cycle")
-    def duty_cycle(self):
+    def channel_1_duty_cycle(self):
         return self.meadowlark_d5020.duty_cycle
 
-    @duty_cycle.setter
-    def set_duty_cycle(self, value):
-        self.meadowlark_d5020.duty_cycle = value
+    @channel_1_duty_cycle.setter
+    def channel_1_set_duty_cycle(self, value):
+        self.meadowlark_d5020.channel_1.duty_cycle = value
 
     ###########################################################################
 
     @attribute(dtype=int, unit="mV", label="Transient Nematic Effect Voltage",
                min_value=0, max_value=10000, doc="T.N.E Voltage")
-    def tne_voltage(self):
-        return self.meadowlark_d5020.tne_voltage
+    def channel_1_tne_voltage(self):
+        return self.meadowlark_d5020.channel_1.tne_voltage
 
-    @tne_voltage.setter
+    @channel_1tne_voltage.setter
     def set_tne_voltage(self, value):
         self.meadowlark_d5020.tne_voltage = value
 
