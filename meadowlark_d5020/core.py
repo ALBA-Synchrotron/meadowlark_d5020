@@ -38,12 +38,6 @@ class Waveform(Enum):
     sawtooth = 4
     TNE = 5
 
-
-class Channels(Enum):
-    One = 1
-    Two = 2
-
-
 class Channel:
     # Min and Max values
     MIN_VOLTAGE = 0
@@ -60,9 +54,9 @@ class Channel:
     MIN_TNE_TIME = 0
     MAX_TNE_TIME = 255
 
-    def __init__(self, number: Channels, conn: Serial):
+    def __init__(self, number: int, conn: Serial):
         # Channel number
-        self.number = number.value
+        self.number = number
         self._conn = conn
 
         # Default parameters of the Channel
@@ -264,13 +258,11 @@ class Channel:
 class Meadowlark_d5020:
     """The central Meadowlark_d5020"""
 
-    def __init__(self, conn):
-        self._conn = conn
+    _conn = None
 
-        self.channel_1 = Channel(Channels.One, conn)
-        self.channel_2 = Channel(Channels.Two, conn)
-
-        self.channels = [self.channel_1, self.channel_2]
+    def __init__(self, conn, channel):
+        Meadowlark_d5020._conn = conn
+        self.channel = channel
 
 
     @property
