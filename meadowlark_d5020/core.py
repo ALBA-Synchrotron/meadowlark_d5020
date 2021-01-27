@@ -90,7 +90,7 @@ class Channel:
         return self.__waveform
 
     @waveform.setter
-    def set_waveform(self, value : Waveform):
+    def waveform(self, value : Waveform):
         self.__waveform = value
 
     ###########################################################################
@@ -100,7 +100,7 @@ class Channel:
         return self.__v1
 
     @v1.setter
-    def set_v1(self, value):
+    def v1(self, value):
         self.__v1 = clamp(value, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
         self.update_device()
 
@@ -111,7 +111,7 @@ class Channel:
         return self.__v2
 
     @v2.setter
-    def set_v2(self, value):
+    def v2(self, value):
         self.__v2 = clamp(value, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
         self.update_device()
     
@@ -122,7 +122,7 @@ class Channel:
         return self.__period_t
 
     @period.setter
-    def set_period(self, value):
+    def period(self, value):
         self.__period_t = clamp(value, Channel.MIN_PERIOD, Channel.MAX_PERIOD)
         self.update_device()
 
@@ -133,7 +133,7 @@ class Channel:
         return self.__phase
 
     @phase.setter
-    def set_phase(self, value):
+    def phase(self, value):
         self.__phase = value % Channel.MAX_PHASE
         self.update_device()
 
@@ -144,7 +144,7 @@ class Channel:
         return self.__duty_cycle
 
     @duty_cycle.setter
-    def set_duty_cycle(self, value):
+    def duty_cycle(self, value):
         self.__duty_cycle = clamp(value, Channel.MIN_DUTY_CICLE, Channel.MAX_DUTY_CICLE)
         self.update_device()
 
@@ -155,7 +155,7 @@ class Channel:
         return self.__tne_voltage
 
     @tne_voltage.setter
-    def set_tne_voltage(self, value):
+    def tne_voltage(self, value):
         self.__tne_voltage = clamp(value, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
         self.update_device()
 
@@ -166,7 +166,7 @@ class Channel:
         return self.__tne_time
 
     @tne_time.setter
-    def set_tne_time(self, value):
+    def tne_time(self, value):
         self.__tne_time = clamp(value, Channel.MIN_TNE_TIME, Channel.MAX_TNE_TIME)
         self.update_device()
 
@@ -224,7 +224,7 @@ class Channel:
         return (int(temp)*500/65535) - 273.15
 
     @temperature_setpoint.setter
-    def set_temperature_setpoint(self, value: int):
+    def temperature_setpoint(self, value: int):
         value = clamp(value, 0, 65535)
         value = (value + 273.15) * 65535/500
         self._conn.write(f"tsp:{self.number},{value}\n")
