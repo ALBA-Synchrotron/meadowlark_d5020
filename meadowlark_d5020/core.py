@@ -62,6 +62,10 @@ class Meadowlark_d5020:
     MIN_TNE_TIME = 0
     MAX_TNE_TIME = 255
 
+    dict_waveform = {
+        0:  "inv", 1:  "sin", 2:  "tri", 3:  "sqr",
+        4:  "saw", 5:  "tnew", 6:  "thr", 7:  "trg", 8:  "extin"}
+
     def __init__(self, number: int, conn: Serial):
         # Channel number
         self.number = number
@@ -83,10 +87,6 @@ class Meadowlark_d5020:
 
         # Others
         self.__external_input = False
-
-        self.dict_waveform = {
-            0:"inv", 1:"sin", 2:"tri", 3:"sqr",
-            4:"saw", 5:"tnew", 6:"thr", 7:"trg", 8:"extin"}
 
     ###########################################################################
 
