@@ -75,7 +75,7 @@ class Meadowlark_d5020:
         5: "{}:{},{},{},{},{},{},{},{}\n",  # tnew
         6: "{}:{},{},{}\n",  # thr
         7: "{}:{}\n",  # trg -> doc: trg:n,?<CR>
-        8: "{}:{}\n",
+        8: "{}:{}\n",  # extin
     }
 
     def __init__(self, number: int, conn: Serial):
