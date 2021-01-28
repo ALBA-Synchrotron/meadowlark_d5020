@@ -66,6 +66,18 @@ class Meadowlark_d5020:
         0:  "inv", 1:  "sin", 2:  "tri", 3:  "sqr",
         4:  "saw", 5:  "tnew", 6:  "thr", 7:  "trg", 8:  "extin"}
 
+    command_waveform = {
+        0: "{}:{},{}\n",  # inv
+        1: "{}:{},{},{},{},{}\n",  # sin
+        2: "{}:{},{},{},{},{}\n",  # saw
+        3: "{}:{},{},{},{},{}\n",  # tri
+        4: "{}:{},{},{},{},{},{}\n",  # sqr
+        5: "{}:{},{},{},{},{},{},{},{}\n",  # tnew
+        6: "{}:{},{},{}\n",  # thr
+        7: "{}:{}\n",  # trg -> doc: trg:n,?<CR>
+        8: "{}:{}\n",
+    }
+
     def __init__(self, number: int, conn: Serial):
         # Channel number
         self.number = number
@@ -229,7 +241,7 @@ class Meadowlark_d5020:
         tt = self.__tne_time
 
         # TODO: Check if the device ignores the unused parameters.
-        message = "{}:{},{},{},{},{},{},{},{}\n".format(
+        message = self.command_waveform[self.__waveform].format(
             w, n, v1, v2, t, ph, dc, tv, tt)
         self._conn.write(message.encode("ascii"))
 
