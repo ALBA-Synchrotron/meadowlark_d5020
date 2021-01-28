@@ -37,14 +37,16 @@ class Waveform(Enum):
     square = 3
     sawtooth = 4
     TNE = 5
+    threshold = 6
+    trigger = 7
+    external_input = 8
 
 
-class Channels(Enum):
-    One = 1
-    Two = 2
+class Meadowlark_d5020:
+    """The central Meadowlark_d5020"""
 
+    _conn = None
 
-class Channel:
     # Min and Max values
     MIN_VOLTAGE = 0
     MAX_VOLTAGE = 10000
@@ -60,15 +62,34 @@ class Channel:
     MIN_TNE_TIME = 0
     MAX_TNE_TIME = 255
 
-    def __init__(self, number: Channels, conn: Serial):
+    dict_waveform = {
+        0:  "inv", 1:  "sin", 2:  "tri", 3:  "sqr",
+        4:  "saw", 5:  "tnew", 6:  "thr", 7:  "trg", 8:  "extin"}
+
+    command_waveform = {
+        0: "{}:{},{}\n",  # inv
+        1: "{}:{},{},{},{},{}\n",  # sin
+        2: "{}:{},{},{},{},{}\n",  # saw
+        3: "{}:{},{},{},{},{}\n",  # tri
+        4: "{}:{},{},{},{},{},{}\n",  # sqr
+        5: "{}:{},{},{},{},{},{},{},{}\n",  # tnew
+        6: "{}:{},{},{}\n",  # thr
+        7: "{}:{}\n",  # trg -> doc: trg:n,?<CR>
+        8: "{}:{}\n",  # extin
+    }
+
+    def __init__(self, number: int, conn: Serial):
         # Channel number
-        self.number = number.value
-        self._conn = conn
+        self.number = number
+        if Meadowlark_d5020._conn is None:
+            Meadowlark_d5020._conn = conn
+        else:
+            print("Using previous serial connection.")
 
         # Default parameters of the Channel
-        self.__waveform = Waveform.invariant
+        self.__waveform = 0
         self.__v1 = 0
-        self.__v2 = 0
+        self.__v2 = 1000
         self.__period_t = 1000
         self.__phase = 0
         self.__duty_cycle = 0
@@ -79,10 +100,6 @@ class Channel:
         # Others
         self.__external_input = False
 
-        self.dict_waveform = dict(
-            invariant="inv", sinusoid="sin", triangle="tri", square="sqr",
-            sawtooth="saw", TNE="tnew")
-
     ###########################################################################
 
     @property
@@ -90,8 +107,9 @@ class Channel:
         return self.__waveform
 
     @waveform.setter
-    def waveform(self, value : Waveform):
+    def waveform(self, value: Waveform):
         self.__waveform = value
+        self.update_device()
 
     ###########################################################################
 
@@ -101,7 +119,7 @@ class Channel:
 
     @v1.setter
     def v1(self, value):
-        self.__v1 = clamp(value, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
+        self.__v1 = clamp(value, self.MIN_VOLTAGE, self.MAX_VOLTAGE)
         self.update_device()
 
     ###########################################################################
@@ -112,9 +130,9 @@ class Channel:
 
     @v2.setter
     def v2(self, value):
-        self.__v2 = clamp(value, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
+        self.__v2 = clamp(value, self.MIN_VOLTAGE, self.MAX_VOLTAGE)
         self.update_device()
-    
+
     ###########################################################################
 
     @property
@@ -123,7 +141,7 @@ class Channel:
 
     @period.setter
     def period(self, value):
-        self.__period_t = clamp(value, Channel.MIN_PERIOD, Channel.MAX_PERIOD)
+        self.__period_t = clamp(value, self.MIN_PERIOD, self.MAX_PERIOD)
         self.update_device()
 
     ###########################################################################
@@ -134,7 +152,7 @@ class Channel:
 
     @phase.setter
     def phase(self, value):
-        self.__phase = value % Channel.MAX_PHASE
+        self.__phase = value % self.MAX_PHASE
         self.update_device()
 
     ###########################################################################
@@ -145,7 +163,8 @@ class Channel:
 
     @duty_cycle.setter
     def duty_cycle(self, value):
-        self.__duty_cycle = clamp(value, Channel.MIN_DUTY_CICLE, Channel.MAX_DUTY_CICLE)
+        self.__duty_cycle = clamp(
+            value, self.MIN_DUTY_CICLE, self.MAX_DUTY_CICLE)
         self.update_device()
 
     ###########################################################################
@@ -156,7 +175,8 @@ class Channel:
 
     @tne_voltage.setter
     def tne_voltage(self, value):
-        self.__tne_voltage = clamp(value, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
+        self.__tne_voltage = clamp(
+            value, self.MIN_VOLTAGE, self.MAX_VOLTAGE)
         self.update_device()
 
     ###########################################################################
@@ -167,7 +187,8 @@ class Channel:
 
     @tne_time.setter
     def tne_time(self, value):
-        self.__tne_time = clamp(value, Channel.MIN_TNE_TIME, Channel.MAX_TNE_TIME)
+        self.__tne_time = clamp(
+            value, self.MIN_TNE_TIME, self.MAX_TNE_TIME)
         self.update_device()
 
     ###########################################################################
@@ -179,18 +200,7 @@ class Channel:
     def toggle_external_input(self):
         # TODO: Check if sending this command twice disable the external input.
         self.__external_input = not self.__external_input
-        self._conn.write(f"extin:{self.number}\n")
-
-    ###########################################################################
-
-    def threshold(self, V1, V2):
-        """
-        I/O connector n is monitored, and if less than 2.5V, output = V1. 
-        Otherwise, output is V2.
-        """
-        V1 = clamp(V1, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
-        V2 = clamp(V2, Channel.MIN_VOLTAGE, Channel.MAX_VOLTAGE)
-        self._conn.write(f"thr:{self.number},{V1},{V2}\n")
+        self._conn.write("extin:{}\n".format(self.number).encode('ascii'))
 
     ###########################################################################
 
@@ -202,18 +212,6 @@ class Channel:
         self._conn.write(f"tmp:{self.number},?\n")
         temp = self._conn.readline()
         return (int(temp)*500/65535) - 273.15
-
-    ###########################################################################
-
-    def trigger(self):
-        # TODO: Check if sending the command returns something, and if sended
-        # again disables the trigger.
-        """
-        I/O connector n is monitored for pulses. When a pulse is received, if 
-        the output is at V1, it switches to V2. If the output is at V2, it 
-        switches to V1.
-        """
-        self._conn.write(f"trg:{self.number},?\n")
 
     ###########################################################################
 
@@ -232,7 +230,7 @@ class Channel:
     ###########################################################################
 
     def update_device(self):
-        w = self.dict_waveform[self.__waveform.name]
+        w = self.dict_waveform[self.__waveform]
         n = self.number
         v1 = self.__v1
         v2 = self.__v2
@@ -243,7 +241,8 @@ class Channel:
         tt = self.__tne_time
 
         # TODO: Check if the device ignores the unused parameters.
-        message = "{}:{},{},{},{},{},{},{},{}\n".format(w,n,v1,v2,t,ph,dc,tv,tt)
+        message = self.command_waveform[self.__waveform].format(
+            w, n, v1, v2, t, ph, dc, tv, tt)
         self._conn.write(message.encode("ascii"))
 
     def sync(self, phase, pulse_length):
@@ -259,19 +258,6 @@ class Channel:
             pulse length in microseconds
         """
         self._conn.write(f"sync:{self.number},{phase},{pulse_length}\n")
-
-
-class Meadowlark_d5020:
-    """The central Meadowlark_d5020"""
-
-    def __init__(self, conn):
-        self._conn = conn
-
-        self.channel_1 = Channel(Channels.One, conn)
-        self.channel_2 = Channel(Channels.Two, conn)
-
-        self.channels = [self.channel_1, self.channel_2]
-
 
     @property
     def firmware(self):
