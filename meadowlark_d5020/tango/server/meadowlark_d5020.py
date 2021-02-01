@@ -21,7 +21,7 @@ class Meadowlark_d5020(Device):
 
     def init_device(self):
         super().init_device()
-        conn = serial.serial_for_url("/tmp/meadowlark_d5020")
+        conn = serial.serial_for_url(self.url)
         self.meadowlark_d5020 = D5020(self.channel, conn)
 
     ###########################################################################
